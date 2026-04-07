@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestor de Tareas</title>
+    <!-- Enlace al CSS -->
+    <link rel="stylesheet" href="frontend/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Gestor de Tareas</h1>
+        <form id="taskForm" class="form-card">
+            <label for="title">Título de la tarea:</label>
+            <input type="text" id="title" name="title" placeholder="Ej: Comprar leche" required>
+
+            <label for="description">Descripción:</label>
+            <textarea id="description" name="description" placeholder="Detalles de la tarea"></textarea>
+
+            <button type="submit">➕ Crear tarea</button>
+        </form>
+
+        <h2>Lista de tareas</h2>
+        <ul id="taskList" class="task-list"></ul>
+    </div>
+
+    <script>
+        const form = document.getElementById("taskForm");
+        const taskList = document.getElementById("taskList");
+
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+            const title = document.getElementById("title").value.trim();
+            const description = document.getElementById("description").value.trim();
+
+            if (!title) return;
+
+            const li = document.createElement("li");
+            li.innerHTML = `
+            <strong>${title}</strong><br>
+            <small>${description}</small>
+            <button class="complete-btn">✔ Completar</button>
+            <button class="delete-btn">❌ Eliminar</button>
+`;
+
+// evento para completar la tarea
+li.querySelector(".complete-btn").addEventListener("click", () => {
+    li.classList.toggle("completed");
+});
+
+// evento para eliminar la tarea
+li.querySelector(".delete-btn").addEventListener("click", () => {
+    li.remove();
+});
+
+taskList.appendChild(li);
+
+
+            // evento para eliminar la tarea
+            li.querySelector(".delete-btn").addEventListener("click", () => {
+                li.remove();
+            });
+
+            taskList.appendChild(li);
+            form.reset();
+        });
+    </script>
+</body>
+</html>
