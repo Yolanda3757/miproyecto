@@ -9,6 +9,7 @@
 <body>
     <div class="container">
         <h1>Gestor de Tareas</h1>
+        <!--formulario de creacion-->
         <form id="taskForm" class="form-card">
             <label for="title">Título de la tarea:</label>
             <input type="text" id="title" name="title" placeholder="Ej: Comprar leche" required>
@@ -18,51 +19,70 @@
 
             <button type="submit">➕ Crear tarea</button>
         </form>
-
+        <!-- Lista de tareas -->
         <h2>Lista de tareas</h2>
         <ul id="taskList" class="task-list"></ul>
     </div>
+    <!-- Modal de edición -->
+      <!-- Aquí insertas el modal -->
+    <div id="editModal" class="modal">
+      <div class="modal-content">
+        <h3>Editar tarea</h3>
+        <label for="editTitle">Título:</label>
+        <input type="text" id="editTitle">
+        <label for="editDescription">Descripción:</label>
+        <textarea id="editDescription"></textarea>
+        <div class="modal-buttons">
+          <button id="saveEdit" class="task-btn edit-btn">Aceptar</button>
+          <button id="cancelEdit" class="task-btn delete-btn">Cancelar</button>
+        </div>
+      </div>
+    </div>
 
     <script>
-        const form = document.getElementById("taskForm");
-        const taskList = document.getElementById("taskList");
+const form = document.getElementById("taskForm");
+const taskList = document.getElementById("taskList");
 
-        form.addEventListener("submit", function(event) {
-            event.preventDefault();
-            const title = document.getElementById("title").value.trim();
-            const description = document.getElementById("description").value.trim();
+// Cargar tareas desde el backend
+async function cargarTareas() {
+  const res = await fetch("http://127.0.0.1:5000/tasks");
+  const tareas = await res.json();
+  taskList.innerHTML = "";
+  tareas.forEach(t => renderTask(t));
+}
 
-            if (!title) return;
+// Renderizar cada tarea
+function renderTask(tarea) {
+  const li = document.createElement("li");
+  li.innerHTML = `
+    <strong>${tarea.titulo}</strong><br>
+    <small>${tarea.descripcion}</small>
+    <button class="task-btn complete-btn">✔ Completar</button>
+    <button class="task-btn delete-btn">❌ Eliminar</button>
+    <button class="task-btn edit-btn">✏ Editar</button>
+  `;
+  taskList.appendChild(li);
+}
 
-            const li = document.createElement("li");
-            li.innerHTML = `
-            <strong>${title}</strong><br>
-            <small>${description}</small>
-            <button class="complete-btn">✔ Completar</button>
-            <button class="delete-btn">❌ Eliminar</button>
-`;
+// Crear tarea (POST al backend)
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  let title = document.getElementById("title").value.trim();
+  let description = document.getElementById("description").value.trim();
+  if (!title) return;
 
-// evento para completar la tarea
-li.querySelector(".complete-btn").addEventListener("click", () => {
-    li.classList.toggle("completed");
+  await fetch("http://127.0.0.1:5000/tasks", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ titulo: title, descripcion: description })
+  });
+
+  cargarTareas(); // refrescar lista desde BD
+  form.reset();
 });
 
-// evento para eliminar la tarea
-li.querySelector(".delete-btn").addEventListener("click", () => {
-    li.remove();
-});
-
-taskList.appendChild(li);
-
-
-            // evento para eliminar la tarea
-            li.querySelector(".delete-btn").addEventListener("click", () => {
-                li.remove();
-            });
-
-            taskList.appendChild(li);
-            form.reset();
-        });
-    </script>
+// Inicializar al cargar la página
+cargarTareas();
+</script>
 </body>
 </html>
