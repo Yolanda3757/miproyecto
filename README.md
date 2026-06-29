@@ -24,3 +24,7 @@ Se trata de una aplicación que implementa una **interfaz gráfica amigable**, c
 1. Clona el repositorio:
    ```bash
    git clone https://github.com/Yolanda3757/miproyecto.git
+
+## Pantallazos de la aplicación
+
+![Gestor de Tareas](docs/Gestor_Tareas.png)
