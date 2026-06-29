@@ -1,44 +1,71 @@
 from flask import Flask, request, jsonify
-import oracledb
+from flask_cors import CORS
+from conexion_sqlserver import obtener_tareas, crear_tarea, get_connection
 
 app = Flask(__name__)
+CORS(app)   # habilita CORS globalmente
 
-# Configuración de conexión
-username = "system"
-password = "Cambiar2026"
-dsn = "localhost:1521/xe"
-
-def get_connection():
-    return oracledb.connect(user=username, password=password, dsn=dsn)
-
-# Endpoint: listar tareas
-@app.route("/tasks", methods=["GET"])
+# ✅ Listar tareas
+@app.route("/tareas", methods=["GET"])
 def listar_tareas():
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, titulo, descripcion, estado FROM tareas")
-    tareas = [
-        {"id": row[0], "titulo": row[1], "descripcion": row[2], "estado": row[3]}
-        for row in cursor
-    ]
-    cursor.close()
-    conn.close()
-    return jsonify(tareas)
+    try:
+        tareas = obtener_tareas()
+        return jsonify(tareas)
+    except Exception as e:
+        print("❌ Error en listar_tareas:", e)
+        return jsonify({"error": str(e)}), 500
 
-# Endpoint: crear tarea
-@app.route("/tasks", methods=["POST"])
-def crear_tarea():
-    data = request.json
+# ✅ Crear tarea
+@app.route("/tareas", methods=["POST"])
+def nueva_tarea():
+    try:
+        data = request.json
+        print("📩 Datos recibidos:", data)
+        crear_tarea(data["titulo"], data["descripcion"])
+        print("✅ Tarea insertada en BD")
+        return jsonify({"mensaje": "Tarea creada correctamente"})
+    except Exception as e:
+        print("❌ Error en nueva_tarea:", e)
+        return jsonify({"error": str(e)}), 500
+
+# ✅ Eliminar tarea
+@app.route("/tareas/<int:id>", methods=["DELETE"])
+def eliminar_tarea(id):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("""
-        INSERT INTO tareas (titulo, descripcion, estado)
-        VALUES (:titulo, :descripcion, 'pendiente')
-    """, titulo=data["titulo"], descripcion=data["descripcion"])
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return jsonify({"mensaje": "Tarea creada con éxito"}), 201
+    try:
+        cursor.execute("DELETE FROM tareas WHERE id = ?", (id,))
+        conn.commit()
+        return jsonify({"mensaje": "Tarea eliminada"}), 200
+    except Exception as e:
+        print("❌ Error al eliminar tarea:", e)
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+# ✅ Editar tarea
+@app.route("/tareas/<int:id>", methods=["PUT"])
+def editar_tarea(id):
+    data = request.get_json()
+    titulo = data.get("titulo")
+    descripcion = data.get("descripcion")
+    estado = data.get("estado")   # 👈 nuevo campo
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "UPDATE tareas SET titulo = ?, descripcion = ?, estado = ? WHERE id = ?",
+            (titulo, descripcion, estado, id)   # 👈 incluimos estado
+        )      
+        conn.commit()
+        return jsonify({"mensaje": "Tarea actualizada"}), 200
+    except Exception as e:
+        print("❌ Error al editar tarea:", e)
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
 
 if __name__ == "__main__":
     app.run(debug=True)
+

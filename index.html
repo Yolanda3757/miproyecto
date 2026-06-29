@@ -9,22 +9,24 @@
 <body>
     <div class="container">
         <h1>Gestor de Tareas</h1>
-        <!--formulario de creacion-->
+        <!--formulario de creación-->
         <form id="taskForm" class="form-card">
-            <label for="title">Título de la tarea:</label>
-            <input type="text" id="title" name="title" placeholder="Ej: Comprar leche" required>
+            <label for="titulo">Título de la tarea:</label>
+            <input type="text" id="titulo" name="titulo" placeholder="Ej: Comprar leche" maxlength="80" required>
 
-            <label for="description">Descripción:</label>
-            <textarea id="description" name="description" placeholder="Detalles de la tarea"></textarea>
+            <label for="descripcion">Descripción:</label>
+            <textarea id="descripcion" name="descripcion" placeholder="Detalles de la tarea" maxlength="200"></textarea>
 
             <button type="submit">➕ Crear tarea</button>
         </form>
+        <!-- Botón para listar -->
+        <button id="listarBtn" class="task-btn">📋 Listar tareas</button>
         <!-- Lista de tareas -->
-        <h2>Lista de tareas</h2>
+    
         <ul id="taskList" class="task-list"></ul>
     </div>
+
     <!-- Modal de edición -->
-      <!-- Aquí insertas el modal -->
     <div id="editModal" class="modal">
       <div class="modal-content">
         <h3>Editar tarea</h3>
@@ -38,51 +40,6 @@
         </div>
       </div>
     </div>
-
-    <script>
-const form = document.getElementById("taskForm");
-const taskList = document.getElementById("taskList");
-
-// Cargar tareas desde el backend
-async function cargarTareas() {
-  const res = await fetch("http://127.0.0.1:5000/tasks");
-  const tareas = await res.json();
-  taskList.innerHTML = "";
-  tareas.forEach(t => renderTask(t));
-}
-
-// Renderizar cada tarea
-function renderTask(tarea) {
-  const li = document.createElement("li");
-  li.innerHTML = `
-    <strong>${tarea.titulo}</strong><br>
-    <small>${tarea.descripcion}</small>
-    <button class="task-btn complete-btn">✔ Completar</button>
-    <button class="task-btn delete-btn">❌ Eliminar</button>
-    <button class="task-btn edit-btn">✏ Editar</button>
-  `;
-  taskList.appendChild(li);
-}
-
-// Crear tarea (POST al backend)
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  let title = document.getElementById("title").value.trim();
-  let description = document.getElementById("description").value.trim();
-  if (!title) return;
-
-  await fetch("http://127.0.0.1:5000/tasks", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ titulo: title, descripcion: description })
-  });
-
-  cargarTareas(); // refrescar lista desde BD
-  form.reset();
-});
-
-// Inicializar al cargar la página
-cargarTareas();
-</script>
+    <script src="frontend/index.js"></script>
 </body>
 </html>
