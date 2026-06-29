@@ -27,5 +27,7 @@ Se trata de una aplicación que implementa una **interfaz gráfica amigable**, c
 
 ## Pantallazos de la aplicación
 
-![Gestor de Tareas](docs/Gestor_Tareas.png)
-![Gestor de Tareas](docs/Listar_Tareas.png)
+### Pantalla principal
+<img src="docs/Gestor_Tareas.png" alt="Pantalla principal" width="400">
+### Lista de tareas
+<img src="docs/Listar_Tareas.png" alt="Lista de tareas" width="400">
