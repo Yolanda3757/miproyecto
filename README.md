@@ -32,3 +32,14 @@ Se trata de una aplicación que implementa una **interfaz gráfica amigable**, c
 
 ## Lista de tareas
 <img src="docs/Listar_Tareas.png" alt="Lista de tareas" width="400">
+
+## 🤖 Bot de Tareas Automáticas
+Este proyecto incluye un script llamado bot_tareas.py dentro de la carpeta backend.
+Su función es crear tareas automáticamente en el Gestor de Tareas, enviando peticiones al servidor Flask mediante la librería requests.
+
+## 🔎 Características
+Genera tareas con títulos y descripciones aleatorias cada vez que se ejecuta.
+
+Se conecta al endpoint Flask en http://127.0.0.1:5000/tareas.
+
+Inserta las tareas directamente en la base de datos, visibles luego en el frontend (index.html).
